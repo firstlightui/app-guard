@@ -35,6 +35,7 @@
         "WojtJanowski\\AppGuard\\Events\\Foregrounded"
     ],
     "android": {
+        "init_function": "com.wojtjanowski.plugins.appguard.appGuardInit",
         "min_version": 29,
         "permissions": [],
         "dependencies": {
