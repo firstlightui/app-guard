@@ -30,7 +30,10 @@
             "description": "Copy text that stays on this device and leaves the clipboard after expiresIn seconds."
         }
     ],
-    "events": [],
+    "events": [
+        "WojtJanowski\\AppGuard\\Events\\Backgrounded",
+        "WojtJanowski\\AppGuard\\Events\\Foregrounded"
+    ],
     "android": {
         "min_version": 29,
         "permissions": [],
