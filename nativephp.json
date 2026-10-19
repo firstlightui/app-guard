@@ -1,0 +1,50 @@
+{
+    "name": "wojt-janowski/nativephp-app-guard",
+    "version": "0.1.0",
+    "description": "App lifecycle events, an app-switcher privacy cover, a return shield and expiring clipboard copies.",
+    "namespace": "AppGuard",
+    "platforms": ["android", "ios"],
+    "bridge_functions": [
+        {
+            "name": "AppGuard.SetPrivacyCover",
+            "ios": "AppGuardFunctions.SetPrivacyCover",
+            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.SetPrivacyCover",
+            "description": "Hide app content in the app switcher: a blur on iOS, FLAG_SECURE on Android."
+        },
+        {
+            "name": "AppGuard.SetShieldTimeout",
+            "ios": "AppGuardFunctions.SetShieldTimeout",
+            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.SetShieldTimeout",
+            "description": "Cover the app on return after this many seconds in the background, until ReleaseShield. Null disables the shield."
+        },
+        {
+            "name": "AppGuard.ReleaseShield",
+            "ios": "AppGuardFunctions.ReleaseShield",
+            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.ReleaseShield",
+            "description": "Fade out and remove the return shield."
+        },
+        {
+            "name": "AppGuard.CopySensitive",
+            "ios": "AppGuardFunctions.CopySensitive",
+            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.CopySensitive",
+            "description": "Copy text that stays on this device and leaves the clipboard after expiresIn seconds."
+        }
+    ],
+    "events": [],
+    "android": {
+        "min_version": 29,
+        "permissions": [],
+        "dependencies": {
+            "implementation": []
+        }
+    },
+    "ios": {
+        "min_version": "18.0",
+        "permissions": [],
+        "dependencies": {
+            "swift_packages": [],
+            "pods": []
+        }
+    },
+    "service_provider": "WojtJanowski\\AppGuard\\AppGuardServiceProvider"
+}

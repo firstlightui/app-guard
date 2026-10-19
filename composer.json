@@ -1,0 +1,25 @@
+{
+    "name": "wojt-janowski/nativephp-app-guard",
+    "description": "App lifecycle events, an app-switcher privacy cover, a return shield and expiring clipboard copies for NativePHP Mobile.",
+    "type": "nativephp-plugin",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "nativephp/mobile": "^4.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "WojtJanowski\\AppGuard\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "WojtJanowski\\AppGuard\\AppGuardServiceProvider"
+            ]
+        },
+        "nativephp": {
+            "manifest": "nativephp.json"
+        }
+    }
+}
