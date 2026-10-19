@@ -42,6 +42,7 @@
         }
     },
     "ios": {
+        "init_function": "appGuardInit",
         "min_version": "18.0",
         "permissions": [],
         "dependencies": {
