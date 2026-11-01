@@ -12,6 +12,11 @@
             "WojtJanowski\\AppGuard\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "WojtJanowski\\AppGuard\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -21,5 +26,22 @@
         "nativephp": {
             "manifest": "nativephp.json"
         }
+    },
+    "minimum-stability": "stable",
+    "require-dev": {
+        "pestphp/pest": "^5.0",
+        "orchestra/testbench": "^11.0",
+        "larastan/larastan": "^3.13",
+        "laravel/pint": "^1.27"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "lint": "pint --test",
+        "analyse": "phpstan analyse --no-progress --memory-limit=1G"
     }
 }

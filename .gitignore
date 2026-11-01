@@ -3,3 +3,6 @@
 /resources/android/build/
 /resources/ios/.build/
 /resources/ios/.swiftpm/
+/vendor/
+/composer.lock
+/.phpunit.cache/

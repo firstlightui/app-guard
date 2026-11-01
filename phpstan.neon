@@ -1,0 +1,9 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - src
+    scanFiles:
+        - vendor/nativephp/mobile/src/jump_bridge_functions.php
+    level: 6
