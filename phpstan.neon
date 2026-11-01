@@ -7,3 +7,4 @@ parameters:
     scanFiles:
         - vendor/nativephp/mobile/src/jump_bridge_functions.php
     level: 6
+    tmpDir: build/phpstan
