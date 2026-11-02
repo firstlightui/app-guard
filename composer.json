@@ -1,6 +1,6 @@
 {
     "name": "firstlightui/app-guard",
-    "description": "App lifecycle events, an app-switcher privacy cover, a return shield and expiring clipboard copies for NativePHP Mobile.",
+    "description": "Lock-screen building blocks for NativePHP Mobile: hide your app in the app switcher, cover it when it returns after a timeout, and copy secrets to a clipboard that clears itself.",
     "type": "nativephp-plugin",
     "license": "MIT",
     "require": {

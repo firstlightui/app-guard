@@ -1,11 +1,13 @@
 # Firstlight App Guard
 
-A NativePHP Mobile plugin for apps that handle secrets. It provides:
+App Guard gives NativePHP Mobile apps the pieces of an app lock that the platform doesn't provide.
 
-- app lifecycle events (`Backgrounded`, `Foregrounded`)
-- an app-switcher privacy cover
-- a return shield that covers the app after it has been in the background for a set time
-- clipboard copies that stay on the device and expire
+- **Privacy cover:** blurs the app in the iOS app switcher; uses `FLAG_SECURE` on Android, which also blocks screenshots.
+- **Return shield:** after a timeout you choose, covers the app with an opaque view before its first frame on return, so nothing shows until your lock screen is ready.
+- **Lifecycle events:** `Backgrounded` and `Foregrounded`, with time away measured natively on a clock that keeps counting while the device sleeps.
+- **Sensitive copy:** puts text on the clipboard device-only (no Universal Clipboard) and removes it after up to an hour.
+
+Pair it with [`nativephp/mobile-biometrics`](https://nativephp.com/plugins/nativephp/mobile-biometrics) for a Face ID or fingerprint lock screen. The Firstlight UI docs have a complete, tested recipe: [Build an app lock screen](https://github.com/firstlightui/nativephp/blob/main/docs/how-to/build-an-app-lock-screen.md). Free and MIT licensed.
 
 Composer package `firstlightui/app-guard`, PHP namespace `FirstlightUI\AppGuard`, Kotlin package `dev.firstlightui.plugins.app_guard`. Requires PHP 8.4 or later, `nativephp/mobile` ^4.6, Android 10 (API 29) or later and iOS 18 or later.
 
