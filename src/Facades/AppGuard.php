@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WojtJanowski\AppGuard\Facades;
+namespace FirstlightUI\AppGuard\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool releaseShield()
  * @method static bool copySensitive(string $text, int $expiresInSeconds = 60)
  *
- * @see \WojtJanowski\AppGuard\AppGuard
+ * @see \FirstlightUI\AppGuard\AppGuard
  */
 final class AppGuard extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \WojtJanowski\AppGuard\AppGuard::class;
+        return \FirstlightUI\AppGuard\AppGuard::class;
     }
 }

@@ -12,8 +12,8 @@ final class AppGuardController {
 
     private static let blurTag = 0x4147_424C
     private static let shieldTag = 0x4147_5348
-    private static let backgroundedEvent = "WojtJanowski\\AppGuard\\Events\\Backgrounded"
-    private static let foregroundedEvent = "WojtJanowski\\AppGuard\\Events\\Foregrounded"
+    private static let backgroundedEvent = "FirstlightUI\\AppGuard\\Events\\Backgrounded"
+    private static let foregroundedEvent = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
 
     private var policy = AppGuardPolicy()
     private var privacyCoverEnabled = false

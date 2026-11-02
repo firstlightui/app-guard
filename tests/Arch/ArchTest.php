@@ -5,5 +5,5 @@ arch('the plugin never blocks the PHP thread by sleeping')
     ->not->toBeUsed();
 
 arch('plugin code declares strict types')
-    ->expect('WojtJanowski\AppGuard')
+    ->expect('FirstlightUI\AppGuard')
     ->toUseStrictTypes();

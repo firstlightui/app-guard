@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace WojtJanowski\AppGuard\Tests;
+namespace FirstlightUI\AppGuard\Tests;
 
+use FirstlightUI\AppGuard\AppGuardServiceProvider;
 use Native\Mobile\NativeServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use WojtJanowski\AppGuard\AppGuardServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {

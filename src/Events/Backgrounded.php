@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WojtJanowski\AppGuard\Events;
+namespace FirstlightUI\AppGuard\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Native\Mobile\Events\Concerns\BroadcastsGlobally;

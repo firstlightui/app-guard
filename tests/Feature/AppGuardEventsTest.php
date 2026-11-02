@@ -1,10 +1,10 @@
 <?php
 
+use FirstlightUI\AppGuard\Events\Backgrounded;
+use FirstlightUI\AppGuard\Events\Foregrounded;
+use FirstlightUI\AppGuard\Tests\Fixtures\AppGuardProbe;
 use Illuminate\Support\Facades\Event;
 use Native\Mobile\Testing\Native;
-use WojtJanowski\AppGuard\Events\Backgrounded;
-use WojtJanowski\AppGuard\Events\Foregrounded;
-use WojtJanowski\AppGuard\Tests\Fixtures\AppGuardProbe;
 
 it('delivers Foregrounded to the screen and app-wide, coercing native payload types', function () {
     Event::fake([Foregrounded::class]);

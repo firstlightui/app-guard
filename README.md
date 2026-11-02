@@ -1,4 +1,4 @@
-# nativephp-app-guard
+# Firstlight App Guard
 
 A NativePHP Mobile plugin for apps that handle secrets. It provides:
 
@@ -7,7 +7,7 @@ A NativePHP Mobile plugin for apps that handle secrets. It provides:
 - a return shield that covers the app after it has been in the background for a set time
 - clipboard copies that stay on the device and expire
 
-Composer package `wojt-janowski/nativephp-app-guard`, PHP namespace `WojtJanowski\AppGuard`, Kotlin package `com.wojtjanowski.plugins.appguard`. Requires PHP 8.4 or later, `nativephp/mobile` ^4.6, Android 10 (API 29) or later and iOS 18 or later.
+Composer package `firstlightui/app-guard`, PHP namespace `FirstlightUI\AppGuard`, Kotlin package `dev.firstlightui.plugins.app_guard`. Requires PHP 8.4 or later, `nativephp/mobile` ^4.6, Android 10 (API 29) or later and iOS 18 or later.
 
 ## Bridge functions
 
@@ -26,8 +26,8 @@ Each facade method returns `true` when the native side applied the change. It re
 
 | Event | When |
 |---|---|
-| `WojtJanowski\AppGuard\Events\Backgrounded` | The app moved to the background. PHP may not run again until the app returns, so do not rely on handling it promptly. |
-| `WojtJanowski\AppGuard\Events\Foregrounded(int $secondsAway, bool $shielded)` | The app returned. `$secondsAway` is measured natively on a clock that keeps running while the device sleeps. `$shielded` is true while the shield covers the app. |
+| `FirstlightUI\AppGuard\Events\Backgrounded` | The app moved to the background. PHP may not run again until the app returns, so do not rely on handling it promptly. |
+| `FirstlightUI\AppGuard\Events\Foregrounded(int $secondsAway, bool $shielded)` | The app returned. `$secondsAway` is measured natively on a clock that keeps running while the device sleeps. `$shielded` is true while the shield covers the app. |
 
 Both events implement `BroadcastsGlobally`, so they reach the active screen's `#[On]` listeners and app-wide `Event::listen` listeners.
 
@@ -35,28 +35,15 @@ If a `Foregrounded` event has `shielded = true`, whoever handles it must call `A
 
 ## Installation
 
-The package is private. Install it from Clinically's Packistry. Add the repository to the app's `composer.json`:
-
-```json
-"repositories": [
-    {
-        "name": "clinically",
-        "type": "composer",
-        "url": "https://repo.clindev.au"
-    }
-]
-```
-
-Then require it. Your `COMPOSER_AUTH` must hold a bearer token for `repo.clindev.au`.
-
 ```bash
-composer require wojt-janowski/nativephp-app-guard:^0.1
+composer require firstlightui/app-guard
+php artisan native:plugin:register firstlightui/app-guard
 ```
 
-NativePHP compiles only the plugins the app lists, so add the provider to `NativeServiceProvider::plugins()`:
+NativePHP compiles only the plugins the app lists. `native:plugin:register` adds the provider to `NativeServiceProvider::plugins()`; to add it by hand:
 
 ```php
-use WojtJanowski\AppGuard\AppGuardServiceProvider;
+use FirstlightUI\AppGuard\AppGuardServiceProvider;
 
 public function plugins(): array
 {
@@ -100,12 +87,9 @@ swift test --package-path resources/ios
 bin/typecheck-ios                                                 # needs Xcode
 ```
 
-CI runs all of these except the iOS typecheck, and runs the PHP suite on both PHP 8.5 and 8.4.
+CI runs all of these except the iOS typecheck, and runs the PHP checks on both PHP 8.4 and 8.5.
 
 ## Releases
 
-Tag `vX.Y.Z` on `main` and keep `version` in `nativephp.json` the same. Packistry imports the tag and serves it from `repo.clindev.au`.
+Tag `vX.Y.Z` on `main` and keep `version` in `nativephp.json` the same. Packagist picks up the tag.
 
-## Origin
-
-Extracted from wojt-janowski/forge-control at 1bef64d28195f3b9651309bd0ee8050c7ed1355a (`plugins/app-guard`), with its history.

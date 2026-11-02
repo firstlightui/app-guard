@@ -1,4 +1,4 @@
-package com.wojtjanowski.plugins.appguard
+package dev.firstlightui.plugins.app_guard
 
 /**
  * Decides when the return shield goes up. Pure Kotlin so it can be unit tested on the JVM;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace WojtJanowski\AppGuard\Tests\Fixtures;
+namespace FirstlightUI\AppGuard\Tests\Fixtures;
 
+use FirstlightUI\AppGuard\Events\Backgrounded;
+use FirstlightUI\AppGuard\Events\Foregrounded;
 use Illuminate\View\View;
 use Native\Mobile\Attributes\On;
 use Native\Mobile\Edge\NativeComponent;
-use WojtJanowski\AppGuard\Events\Backgrounded;
-use WojtJanowski\AppGuard\Events\Foregrounded;
 
 /**
  * A minimal screen that listens to app-guard events the way Plan C's screens will.

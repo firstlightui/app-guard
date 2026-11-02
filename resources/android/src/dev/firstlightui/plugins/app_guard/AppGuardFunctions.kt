@@ -1,4 +1,4 @@
-package com.wojtjanowski.plugins.appguard
+package dev.firstlightui.plugins.app_guard
 
 import android.content.ClipData
 import android.content.ClipboardManager

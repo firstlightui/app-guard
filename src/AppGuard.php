@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WojtJanowski\AppGuard;
+namespace FirstlightUI\AppGuard;
 
 use InvalidArgumentException;
 

@@ -1,4 +1,4 @@
-package com.wojtjanowski.plugins.appguard
+package dev.firstlightui.plugins.app_guard
 
 import android.app.Activity
 import android.app.Application
@@ -28,8 +28,8 @@ fun appGuardInit(context: Context) {
  */
 object AppGuardController : Application.ActivityLifecycleCallbacks {
     private const val SHIELD_TAG = "app-guard-shield"
-    private const val BACKGROUNDED_EVENT = "WojtJanowski\\AppGuard\\Events\\Backgrounded"
-    private const val FOREGROUNDED_EVENT = "WojtJanowski\\AppGuard\\Events\\Foregrounded"
+    private const val BACKGROUNDED_EVENT = "FirstlightUI\\AppGuard\\Events\\Backgrounded"
+    private const val FOREGROUNDED_EVENT = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
 
     private val policy = AppGuardPolicy()
     private var registered = false

@@ -1,5 +1,5 @@
 {
-    "name": "wojt-janowski/nativephp-app-guard",
+    "name": "firstlightui/app-guard",
     "version": "0.1.0",
     "description": "App lifecycle events, an app-switcher privacy cover, a return shield and expiring clipboard copies.",
     "namespace": "AppGuard",
@@ -8,34 +8,34 @@
         {
             "name": "AppGuard.SetPrivacyCover",
             "ios": "AppGuardFunctions.SetPrivacyCover",
-            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.SetPrivacyCover",
+            "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.SetPrivacyCover",
             "description": "Hide app content in the app switcher: a blur on iOS, FLAG_SECURE on Android."
         },
         {
             "name": "AppGuard.SetShieldTimeout",
             "ios": "AppGuardFunctions.SetShieldTimeout",
-            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.SetShieldTimeout",
+            "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.SetShieldTimeout",
             "description": "Cover the app on return after this many seconds in the background, until ReleaseShield. Null disables the shield."
         },
         {
             "name": "AppGuard.ReleaseShield",
             "ios": "AppGuardFunctions.ReleaseShield",
-            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.ReleaseShield",
+            "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.ReleaseShield",
             "description": "Fade out and remove the return shield."
         },
         {
             "name": "AppGuard.CopySensitive",
             "ios": "AppGuardFunctions.CopySensitive",
-            "android": "com.wojtjanowski.plugins.appguard.AppGuardFunctions.CopySensitive",
+            "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.CopySensitive",
             "description": "Copy text that stays on this device and leaves the clipboard after expiresIn seconds."
         }
     ],
     "events": [
-        "WojtJanowski\\AppGuard\\Events\\Backgrounded",
-        "WojtJanowski\\AppGuard\\Events\\Foregrounded"
+        "FirstlightUI\\AppGuard\\Events\\Backgrounded",
+        "FirstlightUI\\AppGuard\\Events\\Foregrounded"
     ],
     "android": {
-        "init_function": "com.wojtjanowski.plugins.appguard.appGuardInit",
+        "init_function": "dev.firstlightui.plugins.app_guard.appGuardInit",
         "min_version": 29,
         "permissions": [],
         "dependencies": {
@@ -51,5 +51,5 @@
             "pods": []
         }
     },
-    "service_provider": "WojtJanowski\\AppGuard\\AppGuardServiceProvider"
+    "service_provider": "FirstlightUI\\AppGuard\\AppGuardServiceProvider"
 }

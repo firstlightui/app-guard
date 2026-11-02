@@ -1,5 +1,5 @@
 {
-    "name": "wojt-janowski/nativephp-app-guard",
+    "name": "firstlightui/app-guard",
     "description": "App lifecycle events, an app-switcher privacy cover, a return shield and expiring clipboard copies for NativePHP Mobile.",
     "type": "nativephp-plugin",
     "license": "MIT",
@@ -9,18 +9,18 @@
     },
     "autoload": {
         "psr-4": {
-            "WojtJanowski\\AppGuard\\": "src/"
+            "FirstlightUI\\AppGuard\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "WojtJanowski\\AppGuard\\Tests\\": "tests/"
+            "FirstlightUI\\AppGuard\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "WojtJanowski\\AppGuard\\AppGuardServiceProvider"
+                "FirstlightUI\\AppGuard\\AppGuardServiceProvider"
             ]
         },
         "nativephp": {

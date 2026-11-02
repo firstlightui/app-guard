@@ -1,5 +1,5 @@
 <?php
 
-use WojtJanowski\AppGuard\Tests\TestCase;
+use FirstlightUI\AppGuard\Tests\TestCase;
 
 pest()->extend(TestCase::class)->in('Feature');

@@ -1,7 +1,7 @@
 <?php
 
+use FirstlightUI\AppGuard\Facades\AppGuard;
 use Native\Mobile\Testing\Native;
-use WojtJanowski\AppGuard\Facades\AppGuard;
 
 it('turns the privacy cover on and off natively', function () {
     $bridge = Native::fakeBridge()->respondTo('AppGuard.SetPrivacyCover', []);

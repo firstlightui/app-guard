@@ -1,4 +1,4 @@
-package com.wojtjanowski.plugins.appguard
+package dev.firstlightui.plugins.app_guard
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
