@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+### Fixed
+
+- The return shield no longer shows the screen it covers as it lifts. `releaseShield()` used to start the 200 ms fade at once, but a lock screen releases the shield from `mount()` and its first render reaches the screen 200 to 300 ms later, so the protected screen showed for a few frames on Android. The shield now waits until a screen published after the release has been drawn, or 500 ms if none arrives, on Android and iOS.
+- A shield image that fails validation no longer stops `AppLock::boot()` from arming the shield. The error is reported and the shield falls back to the splash screen.
+
 ## 1.0.0
 
 App Guard now includes a headless app lock, so apps share one reviewed lock instead of each keeping its own. The existing bridge functions and events are unchanged.

@@ -1,3 +1,5 @@
+import Combine
+
 // Stand-ins for NativePHP host types, used only by bin/typecheck-ios. Signatures copied from
 // nativephp/mobile 4.6 resources/xcode/NativePHP/Bridge/{BridgeRouter,NativePHP}.swift.
 // Keep them in sync when upgrading NativePHP; a real device build is the final check.
@@ -20,4 +22,13 @@ final class LaravelBridge {
     static let shared = LaravelBridge()
 
     var send: ((_ event: String, _ payload: [String: Any?]) -> Void)?
+}
+
+// From nativephp/mobile 4.7 resources/xcode/NativePHP/NativeRender/NativeUIBridge.swift; only currentTree is read.
+struct NativeUITree {}
+
+final class NativeUIBridge: ObservableObject {
+    static let shared = NativeUIBridge()
+
+    @Published var currentTree: NativeUITree?
 }

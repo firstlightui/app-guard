@@ -1,3 +1,4 @@
+import Combine
 import UIKit
 
 /// Called once at launch by NativePHP's generated plugin registration.
@@ -14,6 +15,14 @@ final class AppGuardController {
     private static let shieldTag = 0x4147_5348
     private static let backgroundedEvent = "FirstlightUI\\AppGuard\\Events\\Backgrounded"
     private static let foregroundedEvent = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
+
+    /// Longest wait for a new screen before the shield fades anyway, for a release that changes nothing.
+    private static let releaseTimeout: TimeInterval = 0.5
+
+    /// Time after the new screen's tree is published for SwiftUI to draw it under the shield.
+    private static let drawDelay: TimeInterval = 0.05
+
+    private var pendingRelease: AnyCancellable?
 
     private var policy = AppGuardPolicy()
     private var privacyCoverEnabled = false
@@ -58,9 +67,31 @@ final class AppGuardController {
         shieldImage = image
     }
 
+    /// Fades the shield once a tree published after the release has been drawn, or after releaseTimeout.
+    /// A lock screen releases the shield from mount(), before its first render, so fading at once would
+    /// show the screen being locked until the lock screen's tree arrives.
     func releaseShield() {
         policy.releaseShield()
-        removeOverlay(tag: Self.shieldTag, animated: true)
+
+        var released = false
+        let release = { [weak self] in
+            guard !released else {
+                return
+            }
+
+            released = true
+            self?.pendingRelease = nil
+            self?.removeOverlay(tag: Self.shieldTag, animated: true)
+        }
+
+        // dropFirst skips the tree already on screen; the next value is the one published after the release.
+        pendingRelease = NativeUIBridge.shared.$currentTree
+            .dropFirst()
+            .first()
+            .sink { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.drawDelay, execute: release)
+            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.releaseTimeout, execute: release)
     }
 
     private func willResignActive() {

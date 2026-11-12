@@ -1,6 +1,6 @@
 {
     "name": "firstlightui/app-guard",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "An app lock for NativePHP Mobile: hide your app in the app switcher, cover and lock it when it returns after a timeout, guard screens with an optional PIN, and copy secrets to a clipboard that clears itself.",
     "namespace": "AppGuard",
     "platforms": ["android", "ios"],

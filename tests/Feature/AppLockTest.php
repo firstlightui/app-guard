@@ -2,6 +2,7 @@
 
 use FirstlightUI\AppGuard\AppLock;
 use FirstlightUI\AppGuard\LockSettings;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\File;
 
 beforeEach(function () {
@@ -71,6 +72,21 @@ it('applies the configured shield image once per process', function () {
     expect($this->bridge->callsTo('AppGuard.SetShieldImage'))->toHaveCount(2);
 
     File::deleteDirectory(dirname($public));
+});
+
+it('still arms the shield when the configured shield image is wrong', function () {
+    config()->set('app-guard.lock.timeout', 300);
+    config()->set('app-guard.shield', ['image' => '/var/www/public/cover.png', 'image_dark' => null, 'fit' => 'fill']);
+    $reported = [];
+    app(ExceptionHandler::class)->reportable(function (InvalidArgumentException $e) use (&$reported) {
+        $reported[] = $e->getMessage();
+    });
+
+    app(AppLock::class)->boot();
+
+    expect(shieldTimeouts($this->bridge))->toBe([300])
+        ->and($this->bridge->callsTo('AppGuard.SetShieldImage'))->toBe([])
+        ->and($reported)->toHaveCount(1);
 });
 
 it('boots with the shield off and no cover when the person turned them off', function () {

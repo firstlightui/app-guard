@@ -39,12 +39,18 @@ final class AppLock
 
         $this->booted = true;
         $this->guard->setPrivacyCover($this->settings->privacyCover());
-        $this->guard->setShieldImage(
-            config('app-guard.shield.image'),
-            config('app-guard.shield.image_dark'),
-            (string) config('app-guard.shield.fit', 'fill'),
-        );
         $this->resumeShield();
+
+        // A bad shield image must not leave the app unguarded: report it, and the shield falls back to the splash.
+        try {
+            $this->guard->setShieldImage(
+                config('app-guard.shield.image'),
+                config('app-guard.shield.image_dark'),
+                (string) config('app-guard.shield.fit', 'fill'),
+            );
+        } catch (InvalidArgumentException $e) {
+            report($e);
+        }
     }
 
     public function booted(): bool

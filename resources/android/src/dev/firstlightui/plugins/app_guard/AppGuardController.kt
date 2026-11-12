@@ -8,10 +8,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.TypedValue
+import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import com.nativephp.mobile.ui.nativerender.NativeElementBridge
+import com.nativephp.mobile.ui.nativerender.NativeUIBridge
 import org.json.JSONObject
 
 /** Called by NativePHP's generated plugin registration each time MainActivity is created. */
@@ -30,6 +32,12 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
     private const val SHIELD_TAG = "app-guard-shield"
     private const val BACKGROUNDED_EVENT = "FirstlightUI\\AppGuard\\Events\\Backgrounded"
     private const val FOREGROUNDED_EVENT = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
+
+    /** Longest wait for a new screen before the shield fades anyway, for a release that changes nothing. */
+    private const val RELEASE_TIMEOUT_MS = 500L
+
+    /** Frames to keep the shield up after the new screen's tree is published, so it is drawn under it. */
+    private const val FRAMES_AFTER_PUBLICATION = 2
 
     private val policy = AppGuardPolicy()
     private var registered = false
@@ -64,9 +72,14 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
         shieldImage = image
     }
 
+    /**
+     * Read on the PHP thread, so the publication count predates the tree the caller is about to
+     * publish: a lock screen releases the shield from mount(), before its first render.
+     */
     fun releaseShield(activity: Activity) {
         synchronized(policy) { policy.releaseShield() }
-        activity.runOnUiThread { removeShield(activity) }
+        val publication = NativeUIBridge.treePublicationId.longValue
+        activity.runOnUiThread { removeShield(activity, publication) }
     }
 
     override fun onActivityStarted(activity: Activity) {
@@ -138,13 +151,36 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
         decor.addView(shield, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }
 
-    /** Clears the tag before fading so a shield requested mid-fade is added fresh instead of being skipped. */
-    private fun removeShield(activity: Activity) {
+    /**
+     * Fades the shield once a tree published after [publication] has been drawn, or after
+     * RELEASE_TIMEOUT_MS. Fading at once showed the screen being locked for a few frames, because the
+     * lock screen's tree reaches the renderer 200 to 300 ms after the release.
+     *
+     * Clears the tag first so a shield requested meanwhile is added fresh instead of being skipped.
+     */
+    private fun removeShield(activity: Activity, publication: Long) {
         val decor = activity.window.decorView as ViewGroup
         val shield = decor.findViewWithTag<View>(SHIELD_TAG) ?: return
 
         shield.tag = null
-        shield.animate().alpha(0f).setDuration(200).withEndAction { decor.removeView(shield) }.start()
+        val deadline = SystemClock.uptimeMillis() + RELEASE_TIMEOUT_MS
+        var framesLeft = FRAMES_AFTER_PUBLICATION
+
+        Choreographer.getInstance().postFrameCallback(object : Choreographer.FrameCallback {
+            override fun doFrame(frameTimeNanos: Long) {
+                if (NativeUIBridge.treePublicationId.longValue != publication) {
+                    framesLeft--
+                }
+
+                if (framesLeft > 0 && SystemClock.uptimeMillis() < deadline) {
+                    Choreographer.getInstance().postFrameCallback(this)
+
+                    return
+                }
+
+                shield.animate().alpha(0f).setDuration(200).withEndAction { decor.removeView(shield) }.start()
+            }
+        })
     }
 
     private fun backgroundColor(activity: Activity): Int {
