@@ -17,10 +17,11 @@ final class AppGuardController {
     private static let foregroundedEvent = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
 
     /// Longest wait for a new screen before the shield fades anyway, for a release that changes nothing.
-    private static let releaseTimeout: TimeInterval = 0.5
+    private static let releaseTimeout: TimeInterval = 1.0
 
-    /// Time after the new screen's tree is published for SwiftUI to draw it under the shield.
-    private static let drawDelay: TimeInterval = 0.05
+    /// Time after the new screen's tree is published for it to slide into place under the shield. The
+    /// screen being replaced shows until NativePHP's NavigationStack transition (about 350 ms) ends.
+    private static let settleDelay: TimeInterval = 0.4
 
     private var pendingRelease: AnyCancellable?
 
@@ -67,7 +68,7 @@ final class AppGuardController {
         shieldImage = image
     }
 
-    /// Fades the shield once a tree published after the release has been drawn, or after releaseTimeout.
+    /// Fades the shield once a tree published after the release has slid into place, or after releaseTimeout.
     /// A lock screen releases the shield from mount(), before its first render, so fading at once would
     /// show the screen being locked until the lock screen's tree arrives.
     func releaseShield() {
@@ -89,7 +90,7 @@ final class AppGuardController {
             .dropFirst()
             .first()
             .sink { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + Self.drawDelay, execute: release)
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.settleDelay, execute: release)
             }
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.releaseTimeout, execute: release)
     }

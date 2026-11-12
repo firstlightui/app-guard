@@ -20,7 +20,7 @@ Each facade method returns `true` when the native side applied the change. It re
 |---|---|---|
 | `AppGuard::setPrivacyCover(bool $enabled)` | `AppGuard.SetPrivacyCover` | Hides app content in the app switcher: a blur on iOS, `FLAG_SECURE` on Android. |
 | `AppGuard::shieldAfter(?int $seconds)` | `AppGuard.SetShieldTimeout` | Covers the app on return after at least `$seconds` in the background, until `releaseShield()` is called. `null` turns the shield off; `0` shields every return. |
-| `AppGuard::releaseShield()` | `AppGuard.ReleaseShield` | Fades out and removes the return shield once the next screen has been drawn, or after 500 ms if none arrives. |
+| `AppGuard::releaseShield()` | `AppGuard.ReleaseShield` | Fades out and removes the return shield once the next screen has slid into place, or after 1 s if none arrives. |
 | `AppGuard::setShieldImage(?string $image = null, ?string $darkImage = null, string $fit = 'fill')` | `AppGuard.SetShieldImage` | Sets what the shield shows. See [Shield image](#shield-image). |
 | `AppGuard::copySensitive(string $text, int $expiresInSeconds = 60)` | `AppGuard.CopySensitive` | Copies text that stays on this device and leaves the clipboard after `$expiresInSeconds` (1 to 3600). |
 
@@ -61,7 +61,7 @@ Absolute paths, URLs, paths containing `..`, files that don't exist and other fi
 
 Both events implement `BroadcastsGlobally`, so they reach the active screen's `#[On]` listeners and app-wide `Event::listen` listeners.
 
-If a `Foregrounded` event has `shielded = true`, whoever handles it must call `AppGuard::releaseShield()` once the app is safe to show. A lock screen, for example, releases the shield when it mounts: the shield stays up until the lock screen's first render has been drawn, then fades over 200 ms. A release that publishes no new screen fades after 500 ms.
+If a `Foregrounded` event has `shielded = true`, whoever handles it must call `AppGuard::releaseShield()` once the app is safe to show. A lock screen, for example, releases the shield when it mounts: the shield stays up until the lock screen has slid into place (300 ms after its first render on Android, 400 ms on iOS), then fades over 200 ms. A release that publishes no new screen fades after 1 s.
 
 ## App lock
 
@@ -119,7 +119,7 @@ class VaultScreen extends NativeComponent
 
 ### The lock screen
 
-Your lock screen releases the shield when it opens. The shield waits for the lock screen's first render to be drawn before it fades, so the screen it covered never shows. Once the person has proved who they are, the screen unlocks the app and goes back to the screen they were sent away from:
+Your lock screen releases the shield when it opens. The shield waits for the lock screen to slide into place before it fades, so the screen it covered never shows. Once the person has proved who they are, the screen unlocks the app and goes back to the screen they were sent away from:
 
 ```php
 use FirstlightUI\AppGuard\AppLock;

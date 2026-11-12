@@ -34,10 +34,13 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
     private const val FOREGROUNDED_EVENT = "FirstlightUI\\AppGuard\\Events\\Foregrounded"
 
     /** Longest wait for a new screen before the shield fades anyway, for a release that changes nothing. */
-    private const val RELEASE_TIMEOUT_MS = 500L
+    private const val RELEASE_TIMEOUT_MS = 1_000L
 
-    /** Frames to keep the shield up after the new screen's tree is published, so it is drawn under it. */
-    private const val FRAMES_AFTER_PUBLICATION = 2
+    /**
+     * How long the shield stays up after the new screen's tree is published: NativePHP's stack slides
+     * screens in over 250 ms, and the screen being replaced shows until the slide ends.
+     */
+    private const val SETTLE_AFTER_PUBLICATION_MS = 300L
 
     private val policy = AppGuardPolicy()
     private var registered = false
@@ -152,9 +155,9 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
     }
 
     /**
-     * Fades the shield once a tree published after [publication] has been drawn, or after
+     * Fades the shield once a tree published after [publication] has slid into place, or after
      * RELEASE_TIMEOUT_MS. Fading at once showed the screen being locked for a few frames, because the
-     * lock screen's tree reaches the renderer 200 to 300 ms after the release.
+     * lock screen's tree reaches the renderer 200 to 300 ms after the release and then slides in.
      *
      * Clears the tag first so a shield requested meanwhile is added fresh instead of being skipped.
      */
@@ -163,16 +166,19 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
         val shield = decor.findViewWithTag<View>(SHIELD_TAG) ?: return
 
         shield.tag = null
-        val deadline = SystemClock.uptimeMillis() + RELEASE_TIMEOUT_MS
-        var framesLeft = FRAMES_AFTER_PUBLICATION
+        var deadline = SystemClock.uptimeMillis() + RELEASE_TIMEOUT_MS
+        var published = false
 
         Choreographer.getInstance().postFrameCallback(object : Choreographer.FrameCallback {
             override fun doFrame(frameTimeNanos: Long) {
-                if (NativeUIBridge.treePublicationId.longValue != publication) {
-                    framesLeft--
+                val now = SystemClock.uptimeMillis()
+
+                if (!published && NativeUIBridge.treePublicationId.longValue != publication) {
+                    published = true
+                    deadline = minOf(deadline, now + SETTLE_AFTER_PUBLICATION_MS)
                 }
 
-                if (framesLeft > 0 && SystemClock.uptimeMillis() < deadline) {
+                if (now < deadline) {
                     Choreographer.getInstance().postFrameCallback(this)
 
                     return
