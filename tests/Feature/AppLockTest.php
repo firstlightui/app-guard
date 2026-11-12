@@ -2,6 +2,7 @@
 
 use FirstlightUI\AppGuard\AppLock;
 use FirstlightUI\AppGuard\LockSettings;
+use Illuminate\Support\Facades\File;
 
 beforeEach(function () {
     $this->bridge = fakeGuardBridge();
@@ -49,6 +50,27 @@ it('applies the privacy cover and shield once per process', function () {
 
     expect($this->bridge->callsTo('AppGuard.SetPrivacyCover'))->toHaveCount(2)
         ->and(shieldTimeouts($this->bridge))->toBe([300, 300]);
+});
+
+it('applies the configured shield image once per process', function () {
+    $public = sys_get_temp_dir().'/app-guard-public/'.bin2hex(random_bytes(6));
+    mkdir($public, 0777, true);
+    file_put_contents($public.'/logo.png', 'logo');
+    app()->usePublicPath($public);
+    config()->set('app-guard.shield', ['image' => 'logo.png', 'image_dark' => null, 'fit' => 'center']);
+
+    app(AppLock::class)->boot();
+    app(AppLock::class)->boot();
+
+    expect(array_column($this->bridge->callsTo('AppGuard.SetShieldImage'), 'params'))
+        ->toBe([['image' => $public.'/logo.png', 'imageDark' => null, 'fit' => 'center']]);
+
+    restartProcess();
+    app(AppLock::class)->boot();
+
+    expect($this->bridge->callsTo('AppGuard.SetShieldImage'))->toHaveCount(2);
+
+    File::deleteDirectory(dirname($public));
 });
 
 it('boots with the shield off and no cover when the person turned them off', function () {

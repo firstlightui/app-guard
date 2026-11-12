@@ -38,6 +38,9 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
     @Volatile
     private var privacyCoverEnabled = false
 
+    @Volatile
+    private var shieldImage = ShieldImage(null, null, ShieldFit.FILL)
+
     @Synchronized
     fun start(application: Application) {
         if (registered) {
@@ -55,6 +58,10 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
 
     fun setShieldTimeout(seconds: Long?) {
         synchronized(policy) { policy.shieldAfterSeconds = seconds }
+    }
+
+    fun setShieldImage(image: ShieldImage) {
+        shieldImage = image
     }
 
     fun releaseShield(activity: Activity) {
@@ -121,9 +128,8 @@ object AppGuardController : Application.ActivityLifecycleCallbacks {
             return
         }
 
-        val shield = View(activity).apply {
+        val shield = ShieldView.make(activity, shieldImage, backgroundColor(activity)).apply {
             tag = SHIELD_TAG
-            setBackgroundColor(backgroundColor(activity))
             isClickable = true
             isFocusable = true
             translationZ = 1_000f

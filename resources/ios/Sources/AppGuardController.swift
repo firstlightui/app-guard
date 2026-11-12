@@ -17,6 +17,7 @@ final class AppGuardController {
 
     private var policy = AppGuardPolicy()
     private var privacyCoverEnabled = false
+    private var shieldImage = ShieldImage(path: nil, darkPath: nil, fit: .fill)
     private var started = false
 
     func start() {
@@ -51,6 +52,10 @@ final class AppGuardController {
 
     func setShieldTimeout(_ seconds: Int?) {
         policy.shieldAfterSeconds = seconds
+    }
+
+    func setShieldImage(_ image: ShieldImage) {
+        shieldImage = image
     }
 
     func releaseShield() {
@@ -99,11 +104,49 @@ final class AppGuardController {
     }
 
     private func addShield() {
+        let artwork = shieldArtwork()
+
         for window in windows where window.viewWithTag(Self.shieldTag) == nil {
-            let shield = UIView()
-            shield.backgroundColor = .systemBackground
-            install(shield, tag: Self.shieldTag, in: window)
+            install(ShieldView(artwork: artwork), tag: Self.shieldTag, in: window)
         }
+    }
+
+    /// The app's own image, else its splash (NativePHP's LaunchImage asset), else its icon, else nothing.
+    private func shieldArtwork() -> ShieldView.Artwork? {
+        if let path = shieldImage.path, let light = UIImage(contentsOfFile: path) {
+            return ShieldView.Artwork(image: Self.adaptive(light: light, darkPath: shieldImage.darkPath), fit: shieldImage.fit, isIcon: false)
+        }
+
+        if let splash = UIImage(named: "LaunchImage") {
+            return ShieldView.Artwork(image: splash, fit: .fill, isIcon: false)
+        }
+
+        if let icon = Self.appIcon() {
+            return ShieldView.Artwork(image: icon, fit: .center, isIcon: true)
+        }
+
+        return nil
+    }
+
+    /// One image that follows the light or dark appearance, like an asset catalog entry.
+    private static func adaptive(light: UIImage, darkPath: String?) -> UIImage {
+        guard let darkPath, let dark = UIImage(contentsOfFile: darkPath) else {
+            return light
+        }
+
+        let asset = UIImageAsset()
+        asset.register(light, with: UITraitCollection(userInterfaceStyle: .light))
+        asset.register(dark, with: UITraitCollection(userInterfaceStyle: .dark))
+
+        return asset.image(with: UITraitCollection.current)
+    }
+
+    private static func appIcon() -> UIImage? {
+        let info = Bundle.main.infoDictionary
+        let primary = (info?["CFBundleIcons"] as? [String: Any])?["CFBundlePrimaryIcon"] as? [String: Any]
+        let names = ((primary?["CFBundleIconFiles"] as? [String]) ?? []).reversed() + [primary?["CFBundleIconName"] as? String, "AppIcon"].compactMap { $0 }
+
+        return names.lazy.compactMap { UIImage(named: $0) }.first
     }
 
     private func install(_ view: UIView, tag: Int, in window: UIWindow) {

@@ -3,7 +3,7 @@
 App Guard gives NativePHP Mobile apps the pieces of an app lock that the platform doesn't provide.
 
 - **Privacy cover:** blurs the app in the iOS app switcher; uses `FLAG_SECURE` on Android, which also blocks screenshots.
-- **Return shield:** after a timeout you choose, covers the app with an opaque view before its first frame on return, so nothing shows until your lock screen is ready.
+- **Return shield:** after a timeout you choose, covers the app with an opaque view before its first frame on return, so nothing shows until your lock screen is ready. It shows your own image, or your splash screen, or your app icon.
 - **Lifecycle events:** `Backgrounded` and `Foregrounded`, with time away measured natively on a clock that keeps counting while the device sleeps.
 - **Sensitive copy:** puts text on the clipboard device-only (no Universal Clipboard) and removes it after up to an hour.
 - **App lock:** a headless lock service, an optional PIN, and route middleware that keeps protected screens closed while the app is locked. Your app draws the lock and setup screens.
@@ -21,9 +21,36 @@ Each facade method returns `true` when the native side applied the change. It re
 | `AppGuard::setPrivacyCover(bool $enabled)` | `AppGuard.SetPrivacyCover` | Hides app content in the app switcher: a blur on iOS, `FLAG_SECURE` on Android. |
 | `AppGuard::shieldAfter(?int $seconds)` | `AppGuard.SetShieldTimeout` | Covers the app on return after at least `$seconds` in the background, until `releaseShield()` is called. `null` turns the shield off; `0` shields every return. |
 | `AppGuard::releaseShield()` | `AppGuard.ReleaseShield` | Fades out and removes the return shield. |
+| `AppGuard::setShieldImage(?string $image = null, ?string $darkImage = null, string $fit = 'fill')` | `AppGuard.SetShieldImage` | Sets what the shield shows. See [Shield image](#shield-image). |
 | `AppGuard::copySensitive(string $text, int $expiresInSeconds = 60)` | `AppGuard.CopySensitive` | Copies text that stays on this device and leaves the clipboard after `$expiresInSeconds` (1 to 3600). |
 
-`shieldAfter()` rejects negative timeouts and `copySensitive()` rejects empty text or out-of-range expiries with `InvalidArgumentException`, before any native call.
+`shieldAfter()` rejects negative timeouts, `setShieldImage()` rejects a bad image or fit, and `copySensitive()` rejects empty text or out-of-range expiries with `InvalidArgumentException`, before any native call.
+
+## Shield image
+
+The shield shows, in this order:
+
+1. Your image, set with `shield.image` in config (applied by `AppLock::boot()`) or `AppGuard::setShieldImage()`.
+2. Your splash screen: the `public/splash.png` and `public/splash-dark.png` that NativePHP builds into the app, drawn like the splash.
+3. Your app icon, at 120 points in the middle, with rounded corners on iOS and the launcher mask on Android.
+4. A plain system background, white or black with the appearance.
+
+```php
+// config/app-guard.php
+'shield' => [
+    'image' => 'lock-cover.png',       // under public/
+    'image_dark' => 'lock-cover-dark.png',
+    'fit' => 'center',                 // or 'fill'
+],
+```
+
+| Argument | Meaning |
+|---|---|
+| `$image` / `shield.image` | A path under `public/`, such as `brand/lock.png`. `null` uses the splash screen, then the icon. |
+| `$darkImage` / `shield.image_dark` | Shown in dark mode. Needs `$image`. |
+| `$fit` / `shield.fit` | `fill` covers the screen and crops, like the splash screen. `center` fits the image in a 120-point (dp) square in the middle of the system background, for a logo; supply at least 360 pixels. |
+
+Absolute paths, URLs, paths containing `..`, files that don't exist and other fits throw `InvalidArgumentException`. The shield image only appears on return; the iOS app-switcher cover stays a blur, and Android's app switcher shows the app blank because of `FLAG_SECURE`. Under `native:jump` the device can't read the file from your machine, so the shield falls back to the splash screen.
 
 ## Events
 
@@ -135,7 +162,7 @@ A setup screen calls `Pin::set()` and then `AppLock::unlock()`. Give users a way
 
 | Method | What it does |
 |---|---|
-| `boot(): void` | Applies the privacy cover and the shield timeout once per process. The middleware and the trait call it. |
+| `boot(): void` | Applies the privacy cover, the shield image and the shield timeout once per process. The middleware and the trait call it. |
 | `booted(): bool` | Whether `boot()` has run in this process. |
 | `isEnabled(): bool` | Whether the lock is on. |
 | `isLocked(): bool` | True when the lock is on and the app hasn't been unlocked in this process. |
@@ -186,6 +213,8 @@ $this->app->singleton(LockSettings::class, DeviceLockSettings::class);
 | `lock.settings_path` | `storage_path('app/app-guard/lock.json')` | Where `FileLockSettings` keeps the person's choices |
 | `lock.routes.lock` | `'lock'` | Route name of your lock screen |
 | `lock.routes.setup` | `'lock.setup'` | Route name of your PIN setup screen |
+| `shield.image` / `shield.image_dark` | `null` | Shield image paths under `public/`; see [Shield image](#shield-image) |
+| `shield.fit` | `'fill'` | `fill` or `center` |
 | `pin.min_length` / `pin.max_length` | `4` / `6` | PIN length, in digits |
 | `pin.max_attempts` | `5` | Wrong PINs, across restarts, before `exhausted()` |
 
@@ -242,7 +271,7 @@ php artisan vendor:publish --tag=app-guard-config
 |---|---|---|
 | `Backgrounded`, `Foregrounded` | UIKit `didEnterBackground` and `willEnterForeground` notifications | `Application.ActivityLifecycleCallbacks`: last activity stopped, first activity started |
 | Privacy cover | Blur overlay added on resign-active, removed on become-active | `FLAG_SECURE` on the window. This also blocks screenshots, so tell users. |
-| Return shield | Opaque view over every window, added on `willEnterForeground` | Opaque view over the decor view, added in `onActivityStarted` |
+| Return shield | Opaque view over every window, added on `willEnterForeground`. Splash: the `LaunchImage` asset; icon: `CFBundleIcons`. | Opaque view over the decor view, added in `onActivityStarted`. Splash: the `splash` drawable; icon: the launcher icon. Your image is decoded on the main thread, sampled to the screen size. |
 | Sensitive copy | `UIPasteboard` with `localOnly` and `expirationDate` | `ClipData` with `EXTRA_IS_SENSITIVE`, cleared after `expiresIn` if it is still the current clip |
 
 These were verified against `nativephp/mobile` 4.6.0:

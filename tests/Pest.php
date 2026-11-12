@@ -25,7 +25,8 @@ function fakeGuardBridge(): FakeBridge
     return Native::fakeBridge()
         ->respondTo('AppGuard.SetPrivacyCover', [])
         ->respondTo('AppGuard.SetShieldTimeout', [])
-        ->respondTo('AppGuard.ReleaseShield', []);
+        ->respondTo('AppGuard.ReleaseShield', [])
+        ->respondTo('AppGuard.SetShieldImage', []);
 }
 
 /**

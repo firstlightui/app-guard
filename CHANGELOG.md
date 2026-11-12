@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-App Guard now includes a headless app lock, so apps share one reviewed lock instead of each keeping its own. Bridge functions, events and native code are unchanged.
+App Guard now includes a headless app lock, so apps share one reviewed lock instead of each keeping its own. The existing bridge functions and events are unchanged.
 
 ### Added
 
@@ -12,6 +12,7 @@ App Guard now includes a headless app lock, so apps share one reviewed lock inst
 - The `app-lock` route middleware (`Http\Middleware\EnsureUnlocked`). It sends a locked app to your lock route, or to your setup route while a required PIN is missing. It runs through nativephp/mobile 4.7's `ScreenGuard` before every in-app navigation.
 - The `Concerns\RequiresUnlock` trait for protected screens. On a shielded return, or when the screen shows again while locked, it replaces the screen with the lock route.
 - An app-wide `Foregrounded` listener, active once `AppLock::boot()` has run.
+- A shield image. `AppGuard::setShieldImage()`, the `AppGuard.SetShieldImage` bridge function and the `shield.image`, `shield.image_dark` and `shield.fit` config set what the return shield shows. `fill` covers the screen like the splash screen; `center` fits a logo in a 120-point square. Without an image the shield shows the app's splash screen, else its icon, else a plain background, which is all it showed before. The iOS app-switcher cover stays a blur.
 - `config/app-guard.php`, publishable with `--tag=app-guard-config`.
 
 ### Changed

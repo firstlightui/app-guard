@@ -28,7 +28,7 @@ final class AppLock
     ) {}
 
     /**
-     * Applies the privacy cover and the shield once per PHP process, because native state does not
+     * Applies the privacy cover, the shield image and the shield once per PHP process, because native state does not
      * survive process death. The app-lock middleware and RequiresUnlock call this for you.
      */
     public function boot(): void
@@ -39,6 +39,11 @@ final class AppLock
 
         $this->booted = true;
         $this->guard->setPrivacyCover($this->settings->privacyCover());
+        $this->guard->setShieldImage(
+            config('app-guard.shield.image'),
+            config('app-guard.shield.image_dark'),
+            (string) config('app-guard.shield.fit', 'fill'),
+        );
         $this->resumeShield();
     }
 

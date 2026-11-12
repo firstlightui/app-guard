@@ -24,6 +24,12 @@
             "description": "Fade out and remove the return shield."
         },
         {
+            "name": "AppGuard.SetShieldImage",
+            "ios": "AppGuardFunctions.SetShieldImage",
+            "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.SetShieldImage",
+            "description": "Set the image the return shield shows. A null image uses the splash screen, then the app icon."
+        },
+        {
             "name": "AppGuard.CopySensitive",
             "ios": "AppGuardFunctions.CopySensitive",
             "android": "dev.firstlightui.plugins.app_guard.AppGuardFunctions.CopySensitive",

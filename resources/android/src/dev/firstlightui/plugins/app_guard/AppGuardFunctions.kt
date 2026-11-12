@@ -57,6 +57,33 @@ object AppGuardFunctions {
     }
 
     /**
+     * AppGuard.SetShieldImage {"image": string|null, "imageDark": string|null, "fit": "fill"|"center"}
+     * Paths are absolute. A null image uses the splash screen, then the app icon.
+     */
+    class SetShieldImage(@Suppress("UNUSED_PARAMETER") activity: FragmentActivity) : BridgeFunction {
+        override fun execute(parameters: Map<String, Any>): Map<String, Any> {
+            val image = optionalString(parameters["image"])
+            val imageDark = optionalString(parameters["imageDark"])
+            val fit = ShieldFit.parse(parameters["fit"] as? String ?: "fill")
+
+            if (image == null || imageDark == null || fit == null) {
+                return BridgeResponse.error("INVALID_PARAMETERS", "image and imageDark must be strings or null, and fit fill or center")
+            }
+
+            AppGuardController.setShieldImage(ShieldImage(image.getOrNull(), imageDark.getOrNull(), fit))
+
+            return BridgeResponse.success()
+        }
+
+        /** Success(null) for a missing or null value, null for a value of the wrong type. */
+        private fun optionalString(value: Any?): Result<String?>? = when (value) {
+            null, JSONObject.NULL -> Result.success(null)
+            is String -> Result.success(value)
+            else -> null
+        }
+    }
+
+    /**
      * AppGuard.CopySensitive {"text": string, "expiresIn": int}
      *
      * Marks the clip sensitive so Android 13+ hides it in the clipboard preview, and clears it after

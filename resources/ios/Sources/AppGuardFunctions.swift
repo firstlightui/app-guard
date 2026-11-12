@@ -53,6 +53,32 @@ enum AppGuardFunctions {
         }
     }
 
+    /// AppGuard.SetShieldImage {"image": string|null, "imageDark": string|null, "fit": "fill"|"center"}
+    /// Paths are absolute. A null image uses the splash screen, then the app icon.
+    class SetShieldImage: BridgeFunction {
+        func execute(parameters: [String: Any]) throws -> [String: Any] {
+            guard let image = optionalString(parameters["image"]), let imageDark = optionalString(parameters["imageDark"]),
+                  let fit = ShieldFit(rawValue: parameters["fit"] as? String ?? ShieldFit.fill.rawValue) else {
+                return BridgeResponse.error(code: "INVALID_PARAMETERS", message: "image and imageDark must be strings or null, and fit fill or center")
+            }
+
+            DispatchQueue.main.async {
+                AppGuardController.shared.setShieldImage(ShieldImage(path: image, darkPath: imageDark, fit: fit))
+            }
+
+            return BridgeResponse.success()
+        }
+
+        /// .some(nil) for a missing or null value, nil for a value of the wrong type.
+        private func optionalString(_ value: Any?) -> String?? {
+            if value == nil || value is NSNull {
+                return .some(nil)
+            }
+
+            return (value as? String).map { .some($0) }
+        }
+    }
+
     /// AppGuard.CopySensitive {"text": string, "expiresIn": int}
     /// localOnly keeps the text out of Universal Clipboard; the expiration removes it after expiresIn seconds.
     class CopySensitive: BridgeFunction {

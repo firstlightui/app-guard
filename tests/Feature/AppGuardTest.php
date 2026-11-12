@@ -1,6 +1,7 @@
 <?php
 
 use FirstlightUI\AppGuard\Facades\AppGuard;
+use Illuminate\Support\Facades\File;
 use Native\Mobile\Testing\Native;
 
 it('turns the privacy cover on and off natively', function () {
@@ -79,3 +80,46 @@ it('rejects empty text and clipboard expiries outside 1 to 3600 seconds', functi
     'zero seconds' => ['secret', 0],
     'over an hour' => ['secret', 3601],
 ]);
+
+describe('shield image', function () {
+    beforeEach(function () {
+        $this->public = sys_get_temp_dir().'/app-guard-public/'.bin2hex(random_bytes(6));
+        mkdir($this->public.'/brand', 0777, true);
+        file_put_contents($this->public.'/brand/cover.png', 'light');
+        file_put_contents($this->public.'/brand/cover-dark.png', 'dark');
+        app()->usePublicPath($this->public);
+        $this->bridge = Native::fakeBridge()->respondTo('AppGuard.SetShieldImage', []);
+    });
+
+    afterEach(fn () => File::deleteDirectory(dirname($this->public)));
+
+    it('sends absolute paths under public/ with the fit', function () {
+        expect(AppGuard::setShieldImage('brand/cover.png', 'brand/cover-dark.png', 'center'))->toBeTrue();
+
+        expect($this->bridge->callsTo('AppGuard.SetShieldImage')[0]['params'])->toBe([
+            'image' => $this->public.'/brand/cover.png',
+            'imageDark' => $this->public.'/brand/cover-dark.png',
+            'fit' => 'center',
+        ]);
+    });
+
+    it('sends no image so native falls back to the splash and icon', function () {
+        AppGuard::setShieldImage();
+
+        expect($this->bridge->callsTo('AppGuard.SetShieldImage')[0]['params'])
+            ->toBe(['image' => null, 'imageDark' => null, 'fit' => 'fill']);
+    });
+
+    it('rejects a bad image before calling native code', function (?string $image, ?string $dark, string $fit) {
+        expect(fn () => AppGuard::setShieldImage($image, $dark, $fit))->toThrow(InvalidArgumentException::class);
+        expect($this->bridge->callsTo('AppGuard.SetShieldImage'))->toBe([]);
+    })->with([
+        'unknown fit' => ['brand/cover.png', null, 'cover'],
+        'missing file' => ['brand/missing.png', null, 'fill'],
+        'absolute path' => ['/etc/hosts', null, 'fill'],
+        'outside public' => ['../cover.png', null, 'fill'],
+        'url' => ['https://example.com/cover.png', null, 'fill'],
+        'dark without light' => [null, 'brand/cover-dark.png', 'fill'],
+        'missing dark file' => ['brand/cover.png', 'brand/nope.png', 'fill'],
+    ]);
+});

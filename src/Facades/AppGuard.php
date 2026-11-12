@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool setPrivacyCover(bool $enabled)
  * @method static bool shieldAfter(?int $seconds)
  * @method static bool releaseShield()
+ * @method static bool setShieldImage(?string $image = null, ?string $darkImage = null, string $fit = 'fill')
  * @method static bool copySensitive(string $text, int $expiresInSeconds = 60)
  *
  * @see \FirstlightUI\AppGuard\AppGuard

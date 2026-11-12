@@ -39,6 +39,32 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Shield image
+    |--------------------------------------------------------------------------
+    |
+    | What the return shield shows while it covers the app. image and
+    | image_dark are paths under public/, such as 'lock-cover.png'. With no
+    | image the shield shows the app's splash screen (public/splash.png and
+    | splash-dark.png, which NativePHP builds into the app), else its icon,
+    | else a plain background.
+    |
+    | fit is 'fill', which covers the screen and crops like the splash, or
+    | 'center', which fits the image in a 120-point square in the middle of
+    | the system background, for a logo.
+    |
+    | The iOS app-switcher cover stays a blur. Android shows nothing there,
+    | because FLAG_SECURE blanks the app in the app switcher.
+    |
+    */
+
+    'shield' => [
+        'image' => null,
+        'image_dark' => null,
+        'fit' => 'fill',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | PIN
     |--------------------------------------------------------------------------
     |
