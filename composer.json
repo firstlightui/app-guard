@@ -1,11 +1,11 @@
 {
     "name": "firstlightui/app-guard",
-    "description": "Lock-screen building blocks for NativePHP Mobile: hide your app in the app switcher, cover it when it returns after a timeout, and copy secrets to a clipboard that clears itself.",
+    "description": "An app lock for NativePHP Mobile: hide your app in the app switcher, cover and lock it when it returns after a timeout, guard screens with an optional PIN, and copy secrets to a clipboard that clears itself.",
     "type": "nativephp-plugin",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "nativephp/mobile": "^4.6"
+        "nativephp/mobile": "^4.7"
     },
     "autoload": {
         "psr-4": {
